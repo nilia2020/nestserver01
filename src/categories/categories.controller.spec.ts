@@ -1,18 +1,47 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { CategoriesController } from './categories.controller';
+import {
+  Controller,
+  Get,
+  Param,
+  Post,
+  Body,
+  Put,
+  Delete,
+  ParseIntPipe,
+} from '@nestjs/common';
 
-describe('CategoriesController', () => {
-  let controller: CategoriesController;
+import { CategoriesService } from './categories.service';
+import { CreateCategoryDto } from './dto/create.category.dto';
+import { UpdateCategoryDto } from './dto/update.category.dto';
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      controllers: [CategoriesController],
-    }).compile();
+@Controller('categories')
+export class CategoriesController {
+  constructor(private categoriesService: CategoriesService) {}
 
-    controller = module.get<CategoriesController>(CategoriesController);
-  });
+  @Get()
+  findAll() {
+    return this.categoriesService.findAll();
+  }
 
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
-  });
-});
+  @Get(':id')
+  get(@Param('id', ParseIntPipe) id: number) {
+    return this.categoriesService.findOne(id);
+  }
+
+  @Post()
+  create(@Body() payload: CreateCategoryDto) {
+    return this.categoriesService.create(payload);
+  }
+
+  @Put(':id')
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() payload: UpdateCategoryDto,
+  ) {
+    return this.categoriesService.update(id, payload);
+  }
+
+  @Delete(':id')
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.categoriesService.remove(+id);
+  }
+}
